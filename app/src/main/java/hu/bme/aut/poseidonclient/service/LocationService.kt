@@ -24,7 +24,7 @@ import java.util.*
 
 
 class LocationService : Service() {
-    private val NOTIFICATION_CHANNEL_ID = "my_notification_location"
+    val CHANNEL_ID = "ForegroundServiceChannel"
     private val TAG = "LocationService"
     private var locationHelper: LocationHelper? = null
     val db = Firebase.firestore
@@ -46,15 +46,31 @@ class LocationService : Service() {
             locationHelper = helper
         }
 
+        createNotificationChannel();
 
 
-        val notification = Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
+
+        val notification = Notification.Builder(this, CHANNEL_ID)
             .setContentTitle("notificationTitle")
             .setContentText("lwl")
             .build()
         startForeground(1, notification)
 
         return START_NOT_STICKY
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val serviceChannel = NotificationChannel(
+                CHANNEL_ID,
+                "Foreground Service Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(
+                NotificationManager::class.java
+            )
+            manager.createNotificationChannel(serviceChannel)
+        }
     }
 
     override fun onBind(intent: Intent): IBinder? {

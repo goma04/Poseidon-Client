@@ -73,7 +73,16 @@ class MainActivity : AppCompatActivity() {
             applicationContext,
             Manifest.permission.RECEIVE_SMS
         )
-        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED
+
+        val result3 = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContextCompat.checkSelfPermission(
+                applicationContext,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            )
+        } else {
+            TODO("VERSION.SDK_INT < Q")
+        }
+        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED && result3 == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestPermission() {
@@ -81,10 +90,20 @@ class MainActivity : AppCompatActivity() {
             this,
             arrayOf(
                 Manifest.permission.RECEIVE_SMS, Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION,  Manifest.permission.ACCESS_BACKGROUND_LOCATION
             ),
             101
         )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ),
+                101
+            )
+        }
     }
 }
 
