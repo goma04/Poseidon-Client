@@ -27,7 +27,6 @@ import hu.bme.aut.poseidonclient.MainActivity
 class SMSReceiver : BroadcastReceiver() {
     private val db = Firebase.firestore
 
-
     var body: String? = ""
     var origin: String? = ""
 
@@ -40,8 +39,6 @@ class SMSReceiver : BroadcastReceiver() {
             msg = SmsMessage.createFromPdu(pdu)
             origin = msg.originatingAddress
             body += msg.messageBody
-
-
         }
 
         db.collection("phones").document(Globals.name).collection("messages").add(

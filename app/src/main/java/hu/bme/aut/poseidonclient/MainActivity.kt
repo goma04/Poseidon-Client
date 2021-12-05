@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.checkSelfPermission
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import hu.bme.aut.poseidonclient.broadcastReceiver.SMSReceiver
@@ -26,16 +27,16 @@ class MainActivity : AppCompatActivity() {
     private val MyPREFERENCES = "MyPrefs"
     private val Name = "name"
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
         binding.btnStart.setOnClickListener {
-            applicationContext.startForegroundService(Intent(this, LocationService::class.java))
+            startForegroundService(Intent(this, LocationService::class.java))
         }
 
         val name: String? = sharedpreferences.getString("name", "defa")
@@ -57,53 +58,50 @@ class MainActivity : AppCompatActivity() {
 
         if (!checkPermission()) {
             requestPermission()
-        }
-    }
-
-    private fun checkPermission(): Boolean {
-        val result = ContextCompat.checkSelfPermission(
-            applicationContext,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-        val result1 = ContextCompat.checkSelfPermission(
-            applicationContext,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-        val result2 = ContextCompat.checkSelfPermission(
-            applicationContext,
-            Manifest.permission.RECEIVE_SMS
-        )
-
-        val result3 = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ContextCompat.checkSelfPermission(
-                applicationContext,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            )
-        } else {
-            TODO("VERSION.SDK_INT < Q")
-        }
-        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED && result3 == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestPermission() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                Manifest.permission.RECEIVE_SMS, Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,  Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            ),
-            101
-        )
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
                     Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 ),
-                101
+                1015
             )
         }
+    }
+
+    private fun checkPermission(): Boolean {
+        val result = checkSelfPermission(
+            applicationContext,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        val result1 = checkSelfPermission(
+            applicationContext,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+        val result2 = checkSelfPermission(
+            applicationContext,
+            Manifest.permission.RECEIVE_SMS
+        )
+
+        val result3 = checkSelfPermission(
+            applicationContext,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        )
+        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED && result2 == PackageManager.PERMISSION_GRANTED && result3 == PackageManager.PERMISSION_GRANTED
+    }
+
+
+    private fun requestPermission() {
+
+
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.RECEIVE_SMS, Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,  Manifest.permission.ACCESS_BACKGROUND_LOCATION
+
+            ),
+            101,
+        )
     }
 }
 

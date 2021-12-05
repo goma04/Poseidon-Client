@@ -2,8 +2,6 @@ package hu.bme.aut.poseidonclient.location
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Location
-
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -24,6 +22,3 @@ class LocationHelper(private val context: Context, private val callback: Locatio
     }
 }
 
-interface MyLocationListener {
-    fun onLocationChanged(location: Location?)
-}

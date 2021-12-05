@@ -19,24 +19,18 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import hu.bme.aut.poseidonclient.Globals
 import hu.bme.aut.poseidonclient.R
+import hu.bme.aut.poseidonclient.broadcastReceiver.SMSReceiver
 import hu.bme.aut.poseidonclient.location.LocationHelper
 import java.util.*
+import android.content.IntentFilter
+import android.widget.Toast
 
 
 class LocationService : Service() {
-    val CHANNEL_ID = "ForegroundServiceChannel"
-    private val TAG = "LocationService"
+    private val CHANNEL_ID = "ForegroundServiceChannel"
     private var locationHelper: LocationHelper? = null
     val db = Firebase.firestore
 
-    companion object {
-        var isServiceStarted = false
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -60,45 +54,39 @@ class LocationService : Service() {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
-                CHANNEL_ID,
-                "Foreground Service Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val manager = getSystemService(
-                NotificationManager::class.java
-            )
-            manager.createNotificationChannel(serviceChannel)
-        }
+        val serviceChannel = NotificationChannel(
+            CHANNEL_ID,
+            "Foreground Service Channel",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        val manager = getSystemService(
+            NotificationManager::class.java
+        )
+        manager.createNotificationChannel(serviceChannel)
     }
 
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
 
-    var k = 0
+
+
     inner class LocationServiceCallback : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
-            k++
+
             val location = result.lastLocation ?: return
-            Log.d("location2", "k: $k Lat: ${location.latitude} Lng: ${location.longitude}")
 
             db.collection("phones").document(
-                Globals.name).set(
+                Globals.name
+            ).set(
                 hashMapOf(
                     "_nothing" to "nothing"
                 )
             )
 
-            db.collection("phones").document(Globals.name).collection("location").document("location")
+            db.collection("phones").document(Globals.name).collection("location")
+                .document("location")
                 .set(hashMapOf("latitude" to location.latitude, "longitude" to location.longitude))
-
-        }
-
-        override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-            Log.d("location", "Location available: ${locationAvailability.isLocationAvailable}")
         }
     }
-
 }
